@@ -45,7 +45,7 @@ const unidades = [
     anio: 2023, 
     precio: "u$s 12.500", 
     categoria: "Motos",
-    img: "https://www.google.com/imgres?q=KAWASAKI%20Ninja%20400%20ABS&imgurl=https%3A%2F%2Fi0.wp.com%2Fautomundo.com.ar%2Fwp-content%2Fuploads%2F2021%2F08%2FKawasaki-2.jpg%3Ffit%3D1200%252C800%26ssl%3D1&imgrefurl=https%3A%2F%2Fautomundo.com.ar%2Fkawasaki-ninja-400-abs-krt-caracteristicas-y-precio-lanzamiento%2F&docid=TudNfwuPm7KSpM&tbnid=5-AIs99cAoQziM&vet=12ahUKEwj7wouh-KyTAxV9BrkGHUosDmMQnPAOegQIJBAB..i&w=1200&h=800&hcb=2&ved=2ahUKEwj7wouh-KyTAxV9BrkGHUosDmMQnPAOegQIJBAB"
+    img: "https://i0.wp.com/automundo.com.ar/wp-content/uploads/2021/08/Kawasaki-2.jpg?fit=1200%2C800&ssl=1"
   }
 ];
 
