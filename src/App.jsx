@@ -1,18 +1,23 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useState } from 'react';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Catalog from './pages/Catalog';
-// Por ahora crearemos un componente simple de Admin para que no tire error
-const AdminTemp = () => <div className="p-20 text-white font-black uppercase">Próximamente: Panel de Jorge</div>;
+import Admin from './pages/Admin';
 
 function App() {
+  const [unidadesNuevas, setUnidadesNuevas] = useState([]);
+
+  const agregarUnidad = (nueva) => {
+    setUnidadesNuevas([nueva, ...unidadesNuevas]);
+  };
+
   return (
     <Router>
       <Routes>
-        {/* LA WEB QUE VEN TODOS */}
-        <Route path="/" element={<Catalog />} />
+        {/* URL: tupagina.onrender.com/#/ */}
+        <Route path="/" element={<Catalog unidadesExternas={unidadesNuevas} />} />
         
-        {/* LA WEB SECRETA (Ponele el nombre que quieras) */}
-        <Route path="/panel-jorge-2026" element={<AdminTemp />} />
+        {/* URL: tupagina.onrender.com/#/panel-jorge-2026 */}
+        <Route path="/panel-jorge-2026" element={<Admin onAgregar={agregarUnidad} />} />
       </Routes>
     </Router>
   );
