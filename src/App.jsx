@@ -9,7 +9,7 @@ const unidades = [
     anio: 2023, 
     precio: "u$s 44.500", 
     categoria: "Camionetas",
-    img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=800"
+    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiKquU_TOGhefoqctLLwIN6HYlzaNLUtqdFg&s"
   },
   { 
     id: 2, 
