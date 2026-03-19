@@ -18,7 +18,7 @@ const unidades = [
     anio: 2024, 
     precio: "$ 6.200.000", 
     categoria: "Motos",
-    img: "https://http2.mlstatic.com/D_NQ_NP_629828-MLA74649725510_022024-O.webp"
+    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTP0dAVJfcEfJtZAFdCWkrqC3qGAUAzhbWhQw&s"
   },
   { 
     id: 3, 
