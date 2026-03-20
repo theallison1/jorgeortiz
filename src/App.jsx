@@ -55,7 +55,7 @@ function App() {
 
   const abrirWhatsApp = (modelo = "Consulta General") => {
     const mensaje = encodeURIComponent(`Hola Jorge, vi la unidad ${modelo} en tu web y me interesa recibir más info.`);
-    window.open(`https://wa.me/5492610000000?text=${mensaje}`, '_blank'); // Poné el número real de Jorge acá
+    window.open(`https://wa.me/5492615878806?text=${mensaje}`, '_blank'); // Poné el número real de Jorge acá
   };
 
   const scrollToStock = () => {
