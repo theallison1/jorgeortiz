@@ -151,35 +151,51 @@ function App() {
         ))}
       </main>
 
-      {/* SECCIÓN UBICACIÓN CON MAPA REAL */}
+      {/* SECCIÓN UBICACIÓN - JORGE ORTIZ AUTOMÓVILES */}
       <section id="ubicacion" className="bg-[#050505] py-20 px-6 border-t border-gray-900">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-4xl font-black uppercase italic mb-6">Nuestra <span className="text-[#009de1]">Ubicación</span></h2>
             <div className="space-y-4">
-              <div className="bg-[#111] p-5 rounded border border-gray-800 border-l-4 border-l-[#009de1]">
-                <p className="text-[#009de1] text-[10px] font-black uppercase mb-1">Sucursal Principal</p>
-                <p className="text-white font-bold text-sm">Severo del Castillo 4024, Corralitos</p>
+              <div className="bg-[#111] p-6 rounded-lg border border-[#009de1]/40 border-l-8 border-l-[#009de1] shadow-2xl shadow-[#009de1]/5">
+                <div className="flex justify-between items-start mb-2">
+                  <p className="text-[#009de1] text-[10px] font-black uppercase tracking-widest">Sucursal Principal</p>
+                  <div className="bg-[#009de1] text-white text-[9px] font-black px-2 py-0.5 rounded italic">★ 4.5 (166)</div>
+                </div>
+                <p className="text-xl font-black text-white italic uppercase tracking-tighter mb-1">Jorge Ortiz Automóviles</p>
+                <p className="text-gray-400 text-sm font-bold">Severo del Castillo 4024, M5527 Corralitos, Mendoza</p>
+                
+                {/* BOTÓN DE NAVEGACIÓN DIRECTA */}
+                <a 
+                  href="https://www.google.com/maps/dir//Jorge+Ortiz+Autom%C3%B3viles,+Severo+del+Castillo+4024,+Corralitos,+Mendoza,+Argentina/data=!4m9!4m8!1m0!1m5!1m1!19sChIJJeXGDhsSfpYREF1C5EoT_Hg!2m2!1d-68.7004733!2d-32.905912799999996!3e0!11m1!6b1" 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="inline-flex items-center mt-6 bg-white text-black px-6 py-3 rounded text-[10px] font-black uppercase tracking-widest hover:bg-[#009de1] hover:text-white transition-all shadow-lg"
+                >
+                  <span className="mr-2">📍</span> Iniciar navegación GPS
+                </a>
               </div>
-              <div className="bg-[#111] p-5 rounded border border-gray-800">
+              
+              <div className="bg-[#111] p-5 rounded border border-gray-900 opacity-60">
                 <p className="text-gray-500 text-[10px] font-black uppercase mb-1">Segunda Sucursal</p>
                 <p className="text-white font-bold text-sm">Severo del Castillo 4515, Corralitos</p>
               </div>
-              <p className="text-gray-600 text-[10px] font-bold uppercase mt-4 tracking-widest">Guaymallén, Mendoza, Argentina</p>
             </div>
           </div>
           
-          {/* Iframe de Google Maps con ubicación real de Jorge Ortiz Automóviles */}
-          <div className="h-[400px] rounded-xl overflow-hidden border-2 border-gray-800 shadow-2xl grayscale hover:grayscale-0 transition-all duration-700">
+          {/* MAPA CON EL PUNTO EXACTO */}
+          <div className="h-[450px] rounded-2xl overflow-hidden border-2 border-gray-800 shadow-2xl transition-all duration-700 hover:border-[#009de1]/50 group relative">
             <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3349.526279930438!2d-68.70266192433206!3d-32.90591277360982!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x967e121b0ec6e525%3A0x78fcd34ae4425d45!2sJorge%20Ortiz%20Autom%C3%B3viles!5e0!3m2!1ses-419!2sar!4v1715890000000!5m2!1ses-419!2sar"
+              title="Ubicación Jorge Ortiz Automóviles"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3349.5678!2d-68.7030!3d-32.9059!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x967e121b06c6c525%3A0x78fc134ae4425041!2sJorge%20Ortiz%20Automoviles!5e0!3m2!1ses-419!2sar!4v1710890000000!5m2!1ses-419!2sar"
               width="100%" 
               height="100%" 
-              style={{ border: 0 }} 
+              style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) brightness(95%) contrast(90%)' }} 
               allowFullScreen="" 
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             ></iframe>
+            <div className="absolute inset-0 pointer-events-none border-[1px] border-white/5 rounded-2xl"></div>
           </div>
         </div>
       </section>
