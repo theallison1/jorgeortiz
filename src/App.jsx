@@ -151,33 +151,34 @@ function App() {
         ))}
       </main>
 
-      {/* SECCIÓN UBICACIÓN / MAPA */}
+      {/* SECCIÓN UBICACIÓN CON MAPA REAL */}
       <section id="ubicacion" className="bg-[#050505] py-20 px-6 border-t border-gray-900">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-4xl font-black uppercase italic mb-6">Nuestra <span className="text-[#009de1]">Ubicación</span></h2>
             <div className="space-y-4">
-              <div className="bg-[#111] p-5 rounded border border-gray-800">
+              <div className="bg-[#111] p-5 rounded border border-gray-800 border-l-4 border-l-[#009de1]">
                 <p className="text-[#009de1] text-[10px] font-black uppercase mb-1">Sucursal Principal</p>
                 <p className="text-white font-bold text-sm">Severo del Castillo 4024, Corralitos</p>
               </div>
               <div className="bg-[#111] p-5 rounded border border-gray-800">
-                <p className="text-[#009de1] text-[10px] font-black uppercase mb-1">Sucursal 2</p>
+                <p className="text-gray-500 text-[10px] font-black uppercase mb-1">Segunda Sucursal</p>
                 <p className="text-white font-bold text-sm">Severo del Castillo 4515, Corralitos</p>
               </div>
               <p className="text-gray-600 text-[10px] font-bold uppercase mt-4 tracking-widest">Guaymallén, Mendoza, Argentina</p>
             </div>
           </div>
           
-          {/* Iframe del Mapa */}
+          {/* Iframe de Google Maps con ubicación real de Jorge Ortiz Automóviles */}
           <div className="h-[400px] rounded-xl overflow-hidden border-2 border-gray-800 shadow-2xl grayscale hover:grayscale-0 transition-all duration-700">
             <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3349.5393082536846!2d-68.7335607!3d-32.9103445!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x967e121b1ac6e525%3A0x78fcf44ae4425d51!2sJorge%20Ortiz%20Autom%C3%B3viles!5e0!3m2!1ses-419!2sar!4v1710900000000!5m2!1ses-419!2sar"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3349.526279930438!2d-68.70266192433206!3d-32.90591277360982!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x967e121b0ec6e525%3A0x78fcd34ae4425d45!2sJorge%20Ortiz%20Autom%C3%B3viles!5e0!3m2!1ses-419!2sar!4v1715890000000!5m2!1ses-419!2sar"
               width="100%" 
               height="100%" 
               style={{ border: 0 }} 
               allowFullScreen="" 
               loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
             ></iframe>
           </div>
         </div>
@@ -185,11 +186,6 @@ function App() {
 
       {/* FOOTER */}
       <footer className="border-t border-gray-900 bg-black p-16 text-center">
-        <div className="flex justify-center gap-12 opacity-20 grayscale mb-8 pointer-events-none flex-wrap">
-          <span className="font-black text-xs">SANTANDER</span>
-          <span className="font-black text-xs">BBVA</span>
-          <span className="font-black text-xs">MERCADO PAGO</span>
-        </div>
         <p className="text-[10px] text-gray-700 font-bold uppercase tracking-[0.5em]">
           JORGE ORTIZ AUTOMOTORES • 2026
         </p>
