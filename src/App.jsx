@@ -9,7 +9,7 @@ const unidades = [
     anio: 2023, 
     precio: "u$s 44.500", 
     categoria: "Camionetas",
-    img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=800"
+    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiKquU_TOGhefoqctLLwIN6HYlzaNLUtqdFg&s"
   },
   { 
     id: 2, 
@@ -18,7 +18,7 @@ const unidades = [
     anio: 2024, 
     precio: "$ 6.200.000", 
     categoria: "Motos",
-    img: "https://http2.mlstatic.com/D_NQ_NP_629828-MLA74649725510_022024-O.webp"
+    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTP0dAVJfcEfJtZAFdCWkrqC3qGAUAzhbWhQw&s"
   },
   { 
     id: 3, 
@@ -36,7 +36,7 @@ const unidades = [
     anio: 2024, 
     precio: "u$s 48.200", 
     categoria: "Camionetas",
-    img: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=800"
+    img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=800"
   },
   { 
     id: 5, 
@@ -45,7 +45,7 @@ const unidades = [
     anio: 2023, 
     precio: "u$s 12.500", 
     categoria: "Motos",
-    img: "https://images.unsplash.com/photo-1613141411244-0e4ac259d217?auto=format&fit=crop&q=80&w=800"
+    img: "https://i0.wp.com/automundo.com.ar/wp-content/uploads/2021/08/Kawasaki-2.jpg?fit=1200%2C800&ssl=1"
   }
 ];
 
@@ -60,7 +60,10 @@ function App() {
   };
 
   const scrollToSection = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -85,7 +88,7 @@ function App() {
 
       {/* HEADER */}
       <header className="py-20 px-6 text-center bg-gradient-to-b from-black to-[#0a0a0a]">
-        <h2 className="text-5xl md:text-7xl font-black mb-4 tracking-tighter uppercase italic text-white">
+        <h2 className="text-5xl md:text-7xl font-black mb-4 tracking-tighter uppercase italic">
           STOCK <span className="text-[#009de1]">JORGE ORTIZ</span>
         </h2>
         <p className="text-gray-500 text-[10px] tracking-[0.4em] uppercase font-bold mb-10">
@@ -107,12 +110,17 @@ function App() {
         </div>
       </header>
 
-      {/* GRILLA */}
+      {/* GRILLA DE STOCK */}
       <main id="stock" className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-6 pb-24">
         {filtrados.map(u => (
           <div key={u.id} className="group bg-[#111] rounded-xl overflow-hidden border border-gray-900 hover:border-[#009de1]/50 transition-all duration-500 shadow-2xl">
             <div className="relative h-64 overflow-hidden">
-              <img src={u.img} className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700" alt={u.modelo} />
+              <img 
+                src={u.img} 
+                className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700" 
+                alt={u.modelo}
+                onError={(e) => {e.target.src = "https://via.placeholder.com/800x600?text=Cargando+Imagen..."}} 
+              />
               <div className="absolute top-4 right-4 bg-black/80 px-3 py-1 rounded text-[10px] font-black border border-gray-800">
                 {u.anio}
               </div>
@@ -125,9 +133,11 @@ function App() {
               <div className="mt-6 flex justify-between items-end border-b border-gray-800 pb-6 mb-6">
                 <div>
                   <p className="text-gray-600 text-[9px] font-bold uppercase">Precio Contado</p>
-                  <p className="text-3xl font-black text-white">{u.precio}</p>
+                  <p className="text-3xl font-black text-white italic">{u.precio}</p>
                 </div>
-                <div className="text-right text-[9px] text-gray-600 font-bold uppercase italic leading-none">Entrega<br/>Inmediata</div>
+                <div className="text-right text-[9px] text-gray-600 font-bold uppercase italic leading-none">
+                  Entrega<br/>Inmediata
+                </div>
               </div>
 
               <button 
@@ -141,28 +151,28 @@ function App() {
         ))}
       </main>
 
-      {/* SECCIÓN UBICACIÓN CON MAPA */}
+      {/* SECCIÓN UBICACIÓN / MAPA */}
       <section id="ubicacion" className="bg-[#050505] py-20 px-6 border-t border-gray-900">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-4xl font-black uppercase italic mb-6">Nuestra <span className="text-[#009de1]">Casa Central</span></h2>
-            <p className="text-gray-400 mb-8 font-bold text-sm tracking-wide uppercase">
-              Vení a conocer tu próximo vehículo en nuestras sucursales de Corralitos, Guaymallén.
-            </p>
+            <h2 className="text-4xl font-black uppercase italic mb-6">Nuestra <span className="text-[#009de1]">Ubicación</span></h2>
             <div className="space-y-4">
               <div className="bg-[#111] p-5 rounded border border-gray-800">
-                <p className="text-[#009de1] text-[10px] font-black uppercase mb-1">Sucursal 1</p>
-                <p className="text-white font-bold text-sm">Severo del Castillo 4024, Mendoza</p>
+                <p className="text-[#009de1] text-[10px] font-black uppercase mb-1">Sucursal Principal</p>
+                <p className="text-white font-bold text-sm">Severo del Castillo 4024, Corralitos</p>
               </div>
               <div className="bg-[#111] p-5 rounded border border-gray-800">
                 <p className="text-[#009de1] text-[10px] font-black uppercase mb-1">Sucursal 2</p>
-                <p className="text-white font-bold text-sm">Severo del Castillo 4515, Mendoza</p>
+                <p className="text-white font-bold text-sm">Severo del Castillo 4515, Corralitos</p>
               </div>
+              <p className="text-gray-600 text-[10px] font-bold uppercase mt-4 tracking-widest">Guaymallén, Mendoza, Argentina</p>
             </div>
           </div>
-          <div className="h-[400px] rounded-xl overflow-hidden border-2 border-gray-800 grayscale hover:grayscale-0 transition-all duration-700 shadow-2xl">
+          
+          {/* Iframe del Mapa */}
+          <div className="h-[400px] rounded-xl overflow-hidden border-2 border-gray-800 shadow-2xl grayscale hover:grayscale-0 transition-all duration-700">
             <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3349.882483168233!2d-68.7303023!3d-32.9012435!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x967e121b0ec6e525%3A0x7cfc134ae4425d11!2sJorge%20Ortiz%20Autom%C3%B3viles!5e0!3m2!1ses-419!2sar!4v1709850000000!5m2!1ses-419!2sar" 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3349.5393082536846!2d-68.7335607!3d-32.9103445!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x967e121b1ac6e525%3A0x78fcf44ae4425d51!2sJorge%20Ortiz%20Autom%C3%B3viles!5e0!3m2!1ses-419!2sar!4v1710900000000!5m2!1ses-419!2sar"
               width="100%" 
               height="100%" 
               style={{ border: 0 }} 
