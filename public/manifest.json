@@ -1,11 +1,7 @@
 {
-  "short_name": "Admin Jorge",
-  "name": "Panel Jorge Ortiz Automotores",
-  "start_url": "/admin", 
-  "scope": "/admin",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#000000",
+  "short_name": "Panel Jorge",
+  "name": "Panel de Control - Jorge Ortiz",
+  "description": "Gestión de stock de automotores",
   "icons": [
     {
       "src": "/logo192.png",
@@ -19,5 +15,10 @@
       "sizes": "512x512",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "start_url": "/#/panel-jorge-2026",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#000000",
+  "background_color": "#000000"
 }
