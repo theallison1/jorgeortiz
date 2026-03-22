@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { db } from './firebase'; // Asegurate de que la ruta a tu config de firebase sea correcta
+import { db } from './firebase'; // Verificá que esta ruta a tu Firebase config sea la correcta
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
-const CatalogoPublico = () => {
+const Catalogo = () => {
   const [autos, setAutos] = useState([]);
   const [cargando, setCargando] = useState(true);
 
-  // 1. ESCUCHA DE DATOS EN TIEMPO REAL
+  // Escucha de datos de Firebase en tiempo real
   useEffect(() => {
     const q = query(collection(db, "autos"), orderBy("fecha", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -18,7 +18,7 @@ const CatalogoPublico = () => {
   }, []);
 
   if (cargando) return (
-    <div className="flex justify-center items-center h-screen bg-gray-900">
+    <div className="flex justify-center items-center h-screen bg-black">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>
   );
@@ -26,11 +26,11 @@ const CatalogoPublico = () => {
   return (
     <div className="min-h-screen bg-gray-100 pb-20">
       {/* Header Estilo Concesionaria */}
-      <header className="bg-black text-white p-6 shadow-xl mb-8">
-        <h1 className="text-2xl font-black tracking-tighter text-center">
-          JORGE ORTIZ <span className="text-blue-500">AUTOMOTORES</span>
+      <header className="bg-black text-white p-6 shadow-xl mb-8 border-b-4 border-blue-600">
+        <h1 className="text-2xl font-black tracking-tighter text-center italic">
+          JORGE ORTIZ <span className="text-blue-500 underline">AUTOMOTORES</span>
         </h1>
-        <p className="text-[10px] text-center opacity-70 tracking-[0.2em] uppercase">Mendoza • Argentina</p>
+        <p className="text-[10px] text-center opacity-70 tracking-[0.3em] uppercase mt-1">Excelencia en Selección</p>
       </header>
 
       {/* Grilla de Autos */}
@@ -43,37 +43,39 @@ const CatalogoPublico = () => {
   );
 };
 
-// --- COMPONENTE HIJO: LA TARJETA DEL AUTO ---
+// --- COMPONENTE INTERNO: TARJETA DE AUTO ---
 const CardAuto = ({ auto }) => {
-  const [entrega, setEntrega] = useState(auto.precio * 0.5); // Default 50% de entrega
+  // Estado para la entrega inicial (arranca en 50% del valor)
+  const [entrega, setEntrega] = useState(Number(auto.precio) * 0.5);
   
-  // Cálculo de financiación (TNA 65% aprox)
-  const saldo = auto.precio - entrega;
+  // Cálculo de financiación aproximado (TNA 65% / 12 meses)
+  const saldo = Number(auto.precio) - entrega;
   const cuotaEstimada = saldo > 0 ? (saldo * 1.65) / 12 : 0;
 
   const handleWhatsApp = () => {
-    const msg = `Hola Jorge! Me interesa el ${auto.marca} ${auto.modelo} (${auto.año}) que vi en la App.`;
+    const msg = `Hola Jorge! Me interesa el ${auto.marca} ${auto.modelo} (${auto.año}). Lo vi en la web.`;
     window.open(`https://wa.me/549261XXXXXXX?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col h-full border border-gray-100">
+    <div className="bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col h-full border border-gray-200 hover:shadow-blue-200/50 transition-shadow">
       
-      {/* Sección Imagen con Overlays de Estado */}
-      <div className="relative h-64 w-full">
-        {/* Cartel RESERVADO */}
+      {/* Sección Imagen con Overlays */}
+      <div className="relative h-60 w-full overflow-hidden">
+        
+        {/* Overlay RESERVADO */}
         {auto.estado === 'reservado' && (
           <div className="absolute inset-0 bg-orange-600/80 backdrop-blur-[2px] z-20 flex items-center justify-center">
-            <div className="text-center border-2 border-white p-4 rounded-xl rotate-[-5deg] shadow-2xl">
-              <span className="text-white font-black text-3xl tracking-tighter">RESERVADO</span>
+            <div className="text-center border-4 border-white p-2 rounded-lg rotate-[-10deg] shadow-2xl">
+              <span className="text-white font-black text-2xl tracking-tighter uppercase">RESERVADO</span>
             </div>
           </div>
         )}
 
-        {/* Cartel VENDIDO */}
+        {/* Overlay VENDIDO */}
         {auto.estado === 'vendido' && (
-          <div className="absolute inset-0 bg-gray-900/70 backdrop-blur-[4px] z-20 flex items-center justify-center">
-            <span className="text-white font-black text-4xl border-4 border-red-500 px-6 py-2 -rotate-12 shadow-2xl italic">
+          <div className="absolute inset-0 bg-gray-900/80 backdrop-blur-[3px] z-20 flex items-center justify-center">
+            <span className="text-white font-black text-4xl border-4 border-red-600 px-4 py-1 -rotate-12 shadow-2xl italic">
               VENDIDO
             </span>
           </div>
@@ -82,72 +84,70 @@ const CardAuto = ({ auto }) => {
         <img 
           src={auto.url} 
           alt={auto.modelo}
-          className={`w-full h-full object-cover transition-transform duration-500 hover:scale-110 ${auto.estado === 'vendido' ? 'grayscale' : ''}`}
+          className={`w-full h-full object-cover transition-transform duration-700 hover:scale-110 ${auto.estado === 'vendido' ? 'grayscale' : ''}`}
         />
       </div>
 
-      {/* Info del Vehículo */}
+      {/* Datos del Vehículo */}
       <div className="p-6 flex flex-col flex-grow">
-        <div className="flex justify-between items-start mb-1">
-          <h2 className="text-2xl font-extrabold text-gray-800 uppercase leading-tight">{auto.marca}</h2>
-          <span className="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-md">{auto.año}</span>
+        <div className="flex justify-between items-start mb-2">
+          <h2 className="text-xl font-black text-gray-800 uppercase tracking-tight">{auto.marca} {auto.modelo}</h2>
+          <span className="bg-black text-white text-[10px] font-bold px-2 py-1 rounded italic">{auto.año}</span>
         </div>
-        <p className="text-lg text-gray-600 font-medium mb-4">{auto.modelo}</p>
 
-        {/* Precio */}
-        <div className="mb-6">
-          <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Precio Contado</p>
+        {/* Precio Contado */}
+        <div className="mb-4">
+          <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Precio Especial</p>
           <p className="text-3xl font-black text-blue-700">
             {auto.estado === 'vendido' ? '---' : `$${Number(auto.precio).toLocaleString('es-AR')}`}
           </p>
         </div>
 
-        {/* Simulador de Cuotas (Solo si no está vendido) */}
+        {/* Simulador (Solo si está disponible o reservado) */}
         {auto.estado !== 'vendido' && (
-          <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-6">
-            <p className="text-[9px] font-bold text-gray-400 uppercase mb-3 text-center tracking-widest italic">Simulador de Financiación</p>
+          <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-6">
+            <p className="text-[9px] font-black text-blue-400 uppercase mb-3 text-center tracking-widest">Calculadora de Cuotas</p>
             
             <input 
               type="range" 
               min="0" 
               max={auto.precio} 
-              step="100000"
+              step="50000"
               value={entrega}
               onChange={(e) => setEntrega(Number(e.target.value))}
-              className="w-full h-2 bg-blue-100 rounded-lg appearance-none cursor-pointer accent-blue-600 mb-4"
+              className="w-full h-1.5 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-700 mb-4"
             />
 
-            <div className="grid grid-cols-2 gap-2 text-center">
-              <div className="border-r border-gray-200">
-                <p className="text-[10px] text-gray-400">Entrega inicial</p>
-                <p className="font-bold text-gray-700 text-sm">${Number(entrega).toLocaleString('es-AR')}</p>
+            <div className="flex justify-between items-center text-center">
+              <div className="flex-1">
+                <p className="text-[9px] text-gray-500 uppercase">Entrega inicial</p>
+                <p className="font-bold text-gray-800 text-sm">${Number(entrega).toLocaleString('es-AR')}</p>
               </div>
-              <div>
-                <p className="text-[10px] text-gray-400">12 cuotas de</p>
-                <p className="font-bold text-blue-600 text-sm">${Number(cuotaEstimada).toLocaleString('es-AR', {maximumFractionDigits:0})}</p>
+              <div className="w-px h-8 bg-blue-200 mx-2"></div>
+              <div className="flex-1">
+                <p className="text-[9px] text-gray-500 uppercase font-bold text-blue-600 italic">12 cuotas de</p>
+                <p className="font-black text-blue-700 text-sm">${Number(cuotaEstimada).toLocaleString('es-AR', {maximumFractionDigits:0})}</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Botonera Acción */}
-        <div className="mt-auto space-y-3">
-          <button 
-            onClick={handleWhatsApp}
-            className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg ${
-              auto.estado === 'vendido' 
-              ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
-              : 'bg-green-500 hover:bg-green-600 text-white active:scale-95'
-            }`}
-            disabled={auto.estado === 'vendido'}
-          >
-            <span className="text-xl">📲</span> 
-            {auto.estado === 'vendido' ? 'UNIDAD NO DISPONIBLE' : 'CONSULTAR DISPONIBILIDAD'}
-          </button>
-        </div>
+        {/* Botón WhatsApp */}
+        <button 
+          onClick={handleWhatsApp}
+          disabled={auto.estado === 'vendido'}
+          className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 ${
+            auto.estado === 'vendido' 
+            ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+            : 'bg-green-600 hover:bg-green-700 text-white active:scale-95'
+          }`}
+        >
+          <span className="text-xl">📲</span> 
+          {auto.estado === 'vendido' ? 'Vendido' : 'Consultar'}
+        </button>
       </div>
     </div>
   );
 };
 
-export default CatalogoPublico;
+export default Catalogo;
