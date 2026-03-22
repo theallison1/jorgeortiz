@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { db } from './firebase'; // Verificá que esta ruta a tu Firebase config sea la correcta
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { db } from "../firebase"; // Agregamos un punto extra para "salir" de la carpeta pagesimport { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
 const Catalogo = () => {
   const [autos, setAutos] = useState([]);
