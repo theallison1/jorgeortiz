@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage"; // <--- ESTO IMPORTA EL MOTOR DE FOTOS
 
 const firebaseConfig = {
   apiKey: "AIzaSyA4T4xqBSEtdmnCMvE09s9BeUCqEIFgEuY",
@@ -12,4 +13,6 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app); // Esta es la base de datos que exportamos
+
+export const db = getFirestore(app);
+export const storage = getStorage(app); // <--- ESTA ES LA LÍNEA QUE TE FALTA EXPORTAR
