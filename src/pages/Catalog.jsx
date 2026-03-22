@@ -1,154 +1,153 @@
 import React, { useState, useEffect } from 'react';
-import logoJorge from '../assets/image.png';
-import { db } from '../firebase';
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import { db } from './firebase'; // Asegurate de que la ruta a tu config de firebase sea correcta
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
-const Catalog = () => {
-  const [unidades, setUnidades] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filtro, setFiltro] = useState('Todos');
-  const [galeriaActiva, setGaleriaActiva] = useState(null);
+const CatalogoPublico = () => {
+  const [autos, setAutos] = useState([]);
+  const [cargando, setCargando] = useState(true);
 
+  // 1. ESCUCHA DE DATOS EN TIEMPO REAL
   useEffect(() => {
-    const q = query(collection(db, "unidades"), orderBy("fechaCreacion", "desc"));
+    const q = query(collection(db, "autos"), orderBy("fecha", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setUnidades(docs);
-      setLoading(false);
+      setAutos(docs);
+      setCargando(false);
     });
     return () => unsubscribe();
   }, []);
 
-  const abrirWhatsApp = (u) => {
-    const nro = "542615878806";
-    const texto = u === "Consulta General" 
-      ? "Hola Jorge, te consulto por una unidad de tu stock." 
-      : `Hola Jorge, consulto por la ${u.marca} ${u.modelo} ${u.anio} que vi en la web (${u.precio}).`;
-    window.open(`https://wa.me/${nro}?text=${encodeURIComponent(texto)}`, '_blank');
-  };
-
-  const filtrados = filtro === 'Todos' ? unidades : unidades.filter(u => u.categoria === filtro);
+  if (cargando) return (
+    <div className="flex justify-center items-center h-screen bg-gray-900">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white font-sans antialiased">
-      
-      {/* --- MODAL DE GALERÍA --- */}
-      {galeriaActiva && (
-        <div className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-2xl flex flex-col">
-          <div className="flex justify-between items-center p-6 border-b border-gray-900 bg-black/50 sticky top-0">
-            <h2 className="text-xl font-black uppercase italic tracking-tighter">
-                {galeriaActiva.marca} <span className="text-[#009de1]">{galeriaActiva.modelo}</span>
-            </h2>
-            <button onClick={() => setGaleriaActiva(null)} className="bg-white text-black px-8 py-3 rounded-full font-black text-[10px] uppercase hover:bg-[#009de1] hover:text-white transition-all">Cerrar</button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-6 max-w-5xl mx-auto w-full">
-            {(galeriaActiva.imagenes || [galeriaActiva.imgPrincipal || galeriaActiva.img]).map((img, index) => (
-              <img key={index} src={img} className="w-full h-auto rounded-[2rem] border border-gray-900 shadow-2xl" alt="foto" />
-            ))}
-            <div className="h-20"></div>
-          </div>
-        </div>
-      )}
-
-      {/* NAVBAR FIJA */}
-      <nav className="border-b border-gray-900 p-4 bg-black/90 sticky top-0 z-50 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <a href="/"><img src={logoJorge} alt="Logo" className="h-10 md:h-14 hover:opacity-80 transition-all" /></a>
-          
-          {/* BOTONES NAVEGACIÓN DESKTOP */}
-          <div className="hidden md:flex gap-8 text-[10px] font-black uppercase tracking-widest italic">
-            <button onClick={() => {setFiltro('Todos'); window.scrollTo(0,0)}} className={filtro === 'Todos' ? 'text-[#009de1]' : 'text-gray-400 hover:text-white'}>Inicio</button>
-            <button onClick={() => setFiltro('Camionetas')} className={filtro === 'Camionetas' ? 'text-[#009de1]' : 'text-gray-400 hover:text-white'}>Camionetas</button>
-            <button onClick={() => setFiltro('Motos')} className={filtro === 'Motos' ? 'text-[#009de1]' : 'text-gray-400 hover:text-white'}>Motos</button>
-          </div>
-
-          <button onClick={() => abrirWhatsApp("Consulta General")} className="bg-[#009de1] text-white px-5 py-2.5 rounded-xl font-black text-[9px] md:text-[10px] uppercase tracking-tighter hover:bg-white hover:text-black transition-all">
-            Vender mi unidad
-          </button>
-        </div>
-      </nav>
-
-      {/* HEADER & FILTROS MÓVILES */}
-      <header className="py-20 text-center px-4">
-        <h1 className="text-6xl md:text-9xl font-black italic uppercase tracking-tighter leading-none">
-          STOCK <span className="text-[#009de1]">EXCLUSIVO</span>
+    <div className="min-h-screen bg-gray-100 pb-20">
+      {/* Header Estilo Concesionaria */}
+      <header className="bg-black text-white p-6 shadow-xl mb-8">
+        <h1 className="text-2xl font-black tracking-tighter text-center">
+          JORGE ORTIZ <span className="text-blue-500">AUTOMOTORES</span>
         </h1>
-        <div className="flex flex-wrap justify-center gap-3 mt-12">
-          {['Todos', 'Camionetas', 'Motos'].map(cat => (
-            <button 
-              key={cat} 
-              onClick={() => setFiltro(cat)} 
-              className={`px-8 md:px-12 py-3 text-[10px] font-black uppercase border-2 transition-all rounded-full ${filtro === cat ? 'bg-[#009de1] border-[#009de1] text-white' : 'border-gray-800 text-gray-500 hover:border-gray-600'}`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+        <p className="text-[10px] text-center opacity-70 tracking-[0.2em] uppercase">Mendoza • Argentina</p>
       </header>
 
-      {/* GRILLA DE PRODUCTOS */}
-      <main className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 p-6 pb-32">
-        {loading ? (
-          <div className="col-span-full text-center py-40 font-black uppercase italic animate-pulse text-gray-800">Cargando...</div>
-        ) : filtrados.length > 0 ? (
-          filtrados.map(u => (
-            <div key={u.id} className="bg-[#111] rounded-[2.5rem] border border-gray-900 overflow-hidden shadow-2xl group hover:border-[#009de1] transition-all duration-700 flex flex-col">
-              <div className="h-80 overflow-hidden relative cursor-pointer" onClick={() => setGaleriaActiva(u)}>
-                <img src={u.imgPrincipal || (u.imagenes && u.imagenes[0]) || u.img} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt={u.modelo} />
-                <div className="absolute top-6 left-6 bg-black/80 px-4 py-1.5 rounded-full text-[10px] font-black uppercase border border-white/10 italic">AÑO {u.anio}</div>
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                   <div className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-6 py-2 rounded-full font-black text-[9px] uppercase tracking-widest">Click para ver galería</div>
-                </div>
-                {u.imagenes && u.imagenes.length > 1 && (
-                  <div className="absolute bottom-6 right-6 bg-[#009de1] text-white px-3 py-1 rounded-lg text-[9px] font-black uppercase italic shadow-2xl">+{u.imagenes.length - 1} FOTOS</div>
-                )}
-              </div>
-              <div className="p-10 flex-1 flex flex-col justify-between">
-                <div>
-                    <span className="text-[#009de1] text-[10px] font-black uppercase tracking-[0.3em]">{u.marca}</span>
-                    <h3 className="text-3xl font-black uppercase italic tracking-tighter leading-none mt-2">{u.modelo}</h3>
-                </div>
-                <div className="mt-10 flex flex-col gap-6 border-t border-gray-900 pt-8">
-                  <div className="flex justify-between items-end">
-                    <p className="text-gray-500 text-[10px] font-black uppercase italic">Precio</p>
-                    <p className="text-4xl font-black italic tracking-tighter leading-none">{u.precio}</p>
-                  </div>
-                  <button onClick={() => abrirWhatsApp(u)} className="w-full bg-white text-black py-5 rounded-2xl font-black text-xs uppercase hover:bg-[#009de1] hover:text-white transition-all shadow-xl">Consultar Ahora</button>
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="col-span-full text-center py-40 text-gray-800 font-black uppercase tracking-[0.5em] italic">Sin unidades disponibles</div>
-        )}
-      </main>
-
-      {/* UBICACIÓN & MAPA */}
-      <section className="bg-black py-32 px-6 border-y border-gray-900" id="ubicacion">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-          <div>
-            <h2 className="text-6xl font-black uppercase italic mb-8 leading-none tracking-tighter">EL SALÓN <br/><span className="text-[#009de1]">DE JORGE</span></h2>
-            <div className="bg-[#0a0a0a] p-10 rounded-[2.5rem] border border-gray-900 shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-2 h-full bg-[#009de1]"></div>
-              <p className="text-white font-black text-2xl italic uppercase tracking-tighter">Jorge Ortiz Automóviles</p>
-              <p className="text-gray-500 text-sm font-bold mt-2 italic uppercase">Severo del Castillo 4024, Guaymallén, Mendoza</p>
-              <button onClick={() => window.open('https://maps.app.goo.gl/3A7fK9W5J9G5R7kL9', '_blank')} className="mt-8 bg-gray-900 text-white px-8 py-4 rounded-xl font-black text-[10px] uppercase border border-gray-800 hover:border-[#009de1] transition-all">📍 Ver en Google Maps</button>
-            </div>
-          </div>
-          <div className="h-[500px] rounded-[3rem] overflow-hidden border border-gray-900">
-            <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3350.413123456789!2d-68.730!3d-32.915!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzLCsDU0JzU0LjAiUyA2OMKwNDMnNDguMCJX!5e0!3m2!1ses!2sar!4v123456789" 
-              width="100%" height="100%" style={{ border: 0, filter: 'grayscale(1) invert(0.9)' }} allowFullScreen="" loading="lazy"></iframe>
-          </div>
-        </div>
-      </section>
-
-      <footer className="py-24 text-center opacity-40">
-        <img src={logoJorge} alt="Logo" className="h-12 mx-auto mb-6" />
-        <p className="text-[10px] font-black uppercase tracking-[0.8em]">Jorge Ortiz • Mendoza 2026</p>
-      </footer>
+      {/* Grilla de Autos */}
+      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {autos.map((auto) => (
+          <CardAuto key={auto.id} auto={auto} />
+        ))}
+      </div>
     </div>
   );
 };
 
-export default Catalog;
+// --- COMPONENTE HIJO: LA TARJETA DEL AUTO ---
+const CardAuto = ({ auto }) => {
+  const [entrega, setEntrega] = useState(auto.precio * 0.5); // Default 50% de entrega
+  
+  // Cálculo de financiación (TNA 65% aprox)
+  const saldo = auto.precio - entrega;
+  const cuotaEstimada = saldo > 0 ? (saldo * 1.65) / 12 : 0;
+
+  const handleWhatsApp = () => {
+    const msg = `Hola Jorge! Me interesa el ${auto.marca} ${auto.modelo} (${auto.año}) que vi en la App.`;
+    window.open(`https://wa.me/549261XXXXXXX?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
+  return (
+    <div className="bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col h-full border border-gray-100">
+      
+      {/* Sección Imagen con Overlays de Estado */}
+      <div className="relative h-64 w-full">
+        {/* Cartel RESERVADO */}
+        {auto.estado === 'reservado' && (
+          <div className="absolute inset-0 bg-orange-600/80 backdrop-blur-[2px] z-20 flex items-center justify-center">
+            <div className="text-center border-2 border-white p-4 rounded-xl rotate-[-5deg] shadow-2xl">
+              <span className="text-white font-black text-3xl tracking-tighter">RESERVADO</span>
+            </div>
+          </div>
+        )}
+
+        {/* Cartel VENDIDO */}
+        {auto.estado === 'vendido' && (
+          <div className="absolute inset-0 bg-gray-900/70 backdrop-blur-[4px] z-20 flex items-center justify-center">
+            <span className="text-white font-black text-4xl border-4 border-red-500 px-6 py-2 -rotate-12 shadow-2xl italic">
+              VENDIDO
+            </span>
+          </div>
+        )}
+
+        <img 
+          src={auto.url} 
+          alt={auto.modelo}
+          className={`w-full h-full object-cover transition-transform duration-500 hover:scale-110 ${auto.estado === 'vendido' ? 'grayscale' : ''}`}
+        />
+      </div>
+
+      {/* Info del Vehículo */}
+      <div className="p-6 flex flex-col flex-grow">
+        <div className="flex justify-between items-start mb-1">
+          <h2 className="text-2xl font-extrabold text-gray-800 uppercase leading-tight">{auto.marca}</h2>
+          <span className="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-md">{auto.año}</span>
+        </div>
+        <p className="text-lg text-gray-600 font-medium mb-4">{auto.modelo}</p>
+
+        {/* Precio */}
+        <div className="mb-6">
+          <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Precio Contado</p>
+          <p className="text-3xl font-black text-blue-700">
+            {auto.estado === 'vendido' ? '---' : `$${Number(auto.precio).toLocaleString('es-AR')}`}
+          </p>
+        </div>
+
+        {/* Simulador de Cuotas (Solo si no está vendido) */}
+        {auto.estado !== 'vendido' && (
+          <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-6">
+            <p className="text-[9px] font-bold text-gray-400 uppercase mb-3 text-center tracking-widest italic">Simulador de Financiación</p>
+            
+            <input 
+              type="range" 
+              min="0" 
+              max={auto.precio} 
+              step="100000"
+              value={entrega}
+              onChange={(e) => setEntrega(Number(e.target.value))}
+              className="w-full h-2 bg-blue-100 rounded-lg appearance-none cursor-pointer accent-blue-600 mb-4"
+            />
+
+            <div className="grid grid-cols-2 gap-2 text-center">
+              <div className="border-r border-gray-200">
+                <p className="text-[10px] text-gray-400">Entrega inicial</p>
+                <p className="font-bold text-gray-700 text-sm">${Number(entrega).toLocaleString('es-AR')}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-gray-400">12 cuotas de</p>
+                <p className="font-bold text-blue-600 text-sm">${Number(cuotaEstimada).toLocaleString('es-AR', {maximumFractionDigits:0})}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Botonera Acción */}
+        <div className="mt-auto space-y-3">
+          <button 
+            onClick={handleWhatsApp}
+            className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg ${
+              auto.estado === 'vendido' 
+              ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
+              : 'bg-green-500 hover:bg-green-600 text-white active:scale-95'
+            }`}
+            disabled={auto.estado === 'vendido'}
+          >
+            <span className="text-xl">📲</span> 
+            {auto.estado === 'vendido' ? 'UNIDAD NO DISPONIBLE' : 'CONSULTAR DISPONIBILIDAD'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CatalogoPublico;
