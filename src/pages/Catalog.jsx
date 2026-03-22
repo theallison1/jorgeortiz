@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { db } from "../firebase"; // Agregamos un punto extra para "salir" de la carpeta pagesimport { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { db } from "../firebase"; 
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
 const Catalogo = () => {
   const [autos, setAutos] = useState([]);
@@ -102,7 +103,7 @@ const CardAuto = ({ auto }) => {
           </p>
         </div>
 
-        {/* Simulador (Solo si está disponible o reservado) */}
+        {/* Simulador (Solo si no está vendido) */}
         {auto.estado !== 'vendido' && (
           <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-6">
             <p className="text-[9px] font-black text-blue-400 uppercase mb-3 text-center tracking-widest">Calculadora de Cuotas</p>
