@@ -13,17 +13,17 @@ const Admin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // ESTADOS DE CARGA DE AUTOS
+  // ESTADOS DE GESTIÓN DE STOCK
   const [unidades, setUnidades] = useState([]);
-  const [archivo, setArchivo] = useState(null);
+  const [archivos, setArchivos] = useState([]); // Array para múltiples fotos
   const [loading, setLoading] = useState(false);
   const [nuevo, setNuevo] = useState({ marca: '', modelo: '', anio: '', precio: '', categoria: 'Camionetas' });
 
-  // CONFIGURACIÓN CLOUDINARY
+  // CONFIGURACIÓN CLOUDINARY (Tus datos)
   const CLOUD_NAME = "davvba78z"; 
   const UPLOAD_PRESET = "jorge_preset"; 
 
-  // 1. ESCUCHAR ESTADO DE SESIÓN
+  // 1. MONITOR DE SESIÓN
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -32,17 +32,17 @@ const Admin = () => {
     return () => unsubscribe();
   }, []);
 
-  // 2. FUNCIÓN DE LOGIN
+  // 2. LOGIN
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
-      alert("Acceso denegado. Revisa tus credenciales.");
+      alert("Credenciales incorrectas.");
     }
   };
 
-  // 3. LEER STOCK (Solo si está logueado)
+  // 3. ESCUCHA DE DATOS (REAL-TIME)
   useEffect(() => {
     if (user) {
       const q = query(collection(db, "unidades"), orderBy("fechaCreacion", "desc"));
@@ -53,162 +53,139 @@ const Admin = () => {
     }
   }, [user]);
 
-  // 4. SUBIR A CLOUDINARY Y GUARDAR EN FIREBASE
+  // 4. LÓGICA DE SUBIDA MÚLTIPLE (PROMISE.ALL)
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!archivo) return alert("Por favor, seleccioná una foto.");
+    if (archivos.length === 0) return alert("Seleccioná al menos una foto.");
     
     setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', archivo);
-      formData.append('upload_preset', UPLOAD_PRESET);
+      // Mapeamos los archivos a promesas de subida a Cloudinary
+      const promesasSubida = Array.from(archivos).map(async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', UPLOAD_PRESET);
 
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-        method: 'POST',
-        body: formData
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        return data.secure_url;
       });
-      
-      const data = await res.json();
-      
-      if (!data.secure_url) throw new Error("Fallo en la subida");
 
+      // Ejecutamos todas las subidas en paralelo (Nivel Senior)
+      const urlsImagenes = await Promise.all(promesasSubida);
+
+      // Guardamos en Firebase con el array completo
       await addDoc(collection(db, "unidades"), { 
         ...nuevo, 
-        img: data.secure_url, 
+        imagenes: urlsImagenes, // Array con todas las fotos
+        imgPrincipal: urlsImagenes[0], // Foto de portada
         fechaCreacion: serverTimestamp() 
       });
 
-      alert("✅ ¡Publicado con éxito!");
-      setArchivo(null);
+      alert("✅ Vehículo publicado con galería completa.");
+      setArchivos([]);
       e.target.reset();
     } catch (err) {
-      alert("Error al subir la imagen. Verificá que el preset sea UNSIGNED.");
+      console.error(err);
+      alert("Error en la subida masiva.");
     }
     setLoading(false);
   };
 
-  // 5. BORRAR UNIDAD
   const borrarUnidad = async (id) => {
-    if (window.confirm("¿Seguro que querés eliminar esta unidad?")) {
+    if (window.confirm("¿Eliminar esta unidad del stock?")) {
       await deleteDoc(doc(db, "unidades", id));
     }
   };
 
-  // --- RENDERIZADO CONDICIONAL ---
+  // PANTALLA DE CARGA INICIAL
+  if (cargandoAuth) return <div className="min-h-screen bg-black flex items-center justify-center text-[#009de1] font-black uppercase text-[10px] tracking-[0.5em]">Iniciando Sistema...</div>;
 
-  if (cargandoAuth) {
-    return <div className="min-h-screen bg-black flex items-center justify-center text-[#009de1] font-black uppercase tracking-widest text-[10px]">Verificando Credenciales...</div>;
-  }
-
-  // SI NO HAY USUARIO -> MOSTRAR LOGIN
+  // VISTA LOGIN
   if (!user) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center p-6 italic font-sans">
-        <form onSubmit={handleLogin} className="bg-[#111] p-10 rounded-[2.5rem] border-2 border-[#009de1] w-full max-w-sm shadow-[0_0_60px_rgba(0,157,225,0.15)]">
-          <h2 className="text-2xl font-black text-[#009de1] mb-8 uppercase text-center tracking-tighter italic">Panel Admin</h2>
+        <form onSubmit={handleLogin} className="bg-[#111] p-10 rounded-[2.5rem] border-2 border-[#009de1] w-full max-w-sm shadow-2xl">
+          <h2 className="text-2xl font-black text-[#009de1] mb-8 uppercase text-center italic tracking-tighter">Acceso Jorge Ortiz</h2>
           <div className="flex flex-col gap-4">
-            <input 
-              type="email" 
-              placeholder="USUARIO / EMAIL" 
-              className="bg-black border border-gray-800 p-4 rounded-xl text-white outline-none focus:border-[#009de1] text-[10px] uppercase font-black tracking-widest" 
-              onChange={(e) => setEmail(e.target.value)} 
-              required
-            />
-            <input 
-              type="password" 
-              placeholder="CONTRASEÑA" 
-              className="bg-black border border-gray-800 p-4 rounded-xl text-white outline-none focus:border-[#009de1] text-[10px] uppercase font-black tracking-widest" 
-              onChange={(e) => setPassword(e.target.value)} 
-              required
-            />
-            <button className="bg-[#009de1] text-white py-5 rounded-2xl font-black text-xs uppercase hover:bg-white hover:text-black transition-all mt-4 shadow-lg active:scale-95">
-              Ingresar al Sistema
-            </button>
+            <input type="email" placeholder="EMAIL" className="bg-black border border-gray-800 p-4 rounded-xl text-white outline-none focus:border-[#009de1] text-[10px] font-black uppercase" onChange={(e) => setEmail(e.target.value)} required />
+            <input type="password" placeholder="PASSWORD" className="bg-black border border-gray-800 p-4 rounded-xl text-white outline-none focus:border-[#009de1] text-[10px] font-black uppercase" onChange={(e) => setPassword(e.target.value)} required />
+            <button className="bg-[#009de1] text-white py-5 rounded-2xl font-black text-xs uppercase hover:bg-white hover:text-black transition-all mt-4">Entrar al Panel</button>
           </div>
         </form>
       </div>
     );
   }
 
-  // SI HAY USUARIO -> MOSTRAR PANEL DE GESTIÓN
+  // VISTA PANEL ADMIN
   return (
     <div className="min-h-screen bg-black text-white p-4 font-sans italic">
-      <div className="max-w-5xl mx-auto flex justify-between items-center mb-10 border-b border-gray-900 pb-6">
-        <div>
-          <h1 className="text-2xl font-black uppercase text-[#009de1] leading-none tracking-tighter">Jorge Ortiz</h1>
-          <p className="text-[9px] text-gray-500 font-bold uppercase mt-1 tracking-[0.3em]">Gestión de Stock</p>
-        </div>
-        <button 
-          onClick={() => signOut(auth)} 
-          className="bg-gray-900 border border-gray-800 px-4 py-2 rounded-xl text-[8px] font-black uppercase hover:bg-red-600 hover:text-white transition-all"
-        >
-          Cerrar Sesión
-        </button>
+      <div className="max-w-6xl mx-auto flex justify-between items-center mb-10 border-b border-gray-900 pb-6">
+        <h1 className="text-2xl font-black uppercase text-[#009de1]">Gestión de Unidades</h1>
+        <button onClick={() => signOut(auth)} className="text-[9px] font-black uppercase text-gray-600 hover:text-red-500 transition-all border border-gray-800 px-4 py-2 rounded-xl">Salir</button>
       </div>
       
-      <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
         
-        {/* COLUMNA CARGA */}
-        <div className="bg-[#111] border-2 border-[#009de1] p-8 rounded-[2.5rem] h-fit">
-          <h2 className="text-sm font-black uppercase mb-8 italic tracking-widest text-center text-gray-400 underline decoration-[#009de1] underline-offset-8">Nueva Unidad</h2>
-          
+        {/* FORMULARIO */}
+        <div className="bg-[#111] border-2 border-[#009de1] p-8 rounded-[2.5rem] h-fit shadow-2xl">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-[10px] font-black uppercase">
-            <label className="bg-black border-2 border-dashed border-gray-800 p-12 rounded-2xl cursor-pointer hover:border-[#009de1] text-center transition-all group">
-              <span className={archivo ? "text-[#009de1]" : "text-gray-600 group-hover:text-white"}>
-                {archivo ? `✅ LISTO: ${archivo.name}` : "📂 CLIC PARA ELEGIR FOTO"}
+            
+            <label className="bg-black border-2 border-dashed border-gray-800 p-12 rounded-3xl cursor-pointer hover:border-[#009de1] text-center transition-all group">
+              <span className={archivos.length > 0 ? "text-[#009de1]" : "text-gray-600 group-hover:text-white"}>
+                {archivos.length > 0 ? `✅ ${archivos.length} FOTOS SELECCIONADAS` : "📂 SELECCIONAR GALERÍA DE FOTOS"}
               </span>
-              <input type="file" className="hidden" accept="image/*" onChange={(e) => setArchivo(e.target.files[0])} />
+              <input type="file" multiple className="hidden" accept="image/*" onChange={(e) => setArchivos(e.target.files)} />
             </label>
+
+            {/* PREVIEW RÁPIDO (Senior UX) */}
+            {archivos.length > 0 && (
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {Array.from(archivos).map((f, i) => (
+                  <img key={i} src={URL.createObjectURL(f)} className="w-12 h-12 object-cover rounded-lg border border-gray-700" alt="preview" />
+                ))}
+              </div>
+            )}
 
             <input className="bg-black border border-gray-800 p-4 rounded-xl outline-none focus:border-[#009de1]" placeholder="MARCA" onChange={e => setNuevo({...nuevo, marca: e.target.value.toUpperCase()})} required />
             <input className="bg-black border border-gray-800 p-4 rounded-xl outline-none focus:border-[#009de1]" placeholder="MODELO" onChange={e => setNuevo({...nuevo, modelo: e.target.value.toUpperCase()})} required />
             
             <div className="grid grid-cols-2 gap-3">
-              <input className="bg-black border border-gray-800 p-4 rounded-xl outline-none focus:border-[#009de1]" placeholder="AÑO" onChange={e => setNuevo({...nuevo, anio: e.target.value})} required />
-              <input className="bg-black border border-gray-800 p-4 rounded-xl outline-none focus:border-[#009de1]" placeholder="PRECIO" onChange={e => setNuevo({...nuevo, precio: e.target.value})} required />
+              <input className="bg-black border border-gray-800 p-4 rounded-xl" placeholder="AÑO" onChange={e => setNuevo({...nuevo, anio: e.target.value})} required />
+              <input className="bg-black border border-gray-800 p-4 rounded-xl" placeholder="PRECIO" onChange={e => setNuevo({...nuevo, precio: e.target.value})} required />
             </div>
 
-            <select className="bg-black border border-gray-800 p-4 rounded-xl font-black uppercase tracking-widest cursor-pointer" onChange={e => setNuevo({...nuevo, categoria: e.target.value})}>
+            <select className="bg-black border border-gray-800 p-4 rounded-xl font-black uppercase tracking-widest" onChange={e => setNuevo({...nuevo, categoria: e.target.value})}>
               <option value="Camionetas">Camionetas</option>
               <option value="Motos">Motos</option>
             </select>
 
-            <button type="submit" disabled={loading} className="bg-[#009de1] py-5 rounded-2xl font-black text-[11px] uppercase mt-4 hover:scale-[1.02] transition-all shadow-xl active:scale-95 disabled:opacity-50">
-              {loading ? "SUBIENDO A LA NUBE..." : "PUBLICAR UNIDAD"}
+            <button type="submit" disabled={loading} className="bg-[#009de1] py-5 rounded-2xl font-black text-[11px] uppercase mt-4 hover:scale-[1.02] transition-all shadow-xl disabled:opacity-50">
+              {loading ? "PROCESANDO GALERÍA..." : "PUBLICAR EN LA WEB"}
             </button>
           </form>
         </div>
 
-        {/* COLUMNA STOCK */}
+        {/* LISTADO */}
         <div className="bg-[#050505] border border-gray-900 p-8 rounded-[2.5rem] shadow-2xl overflow-y-auto max-h-[700px]">
-          <h2 className="text-sm font-black uppercase mb-8 italic tracking-widest text-gray-500">Stock Actual</h2>
+          <h2 className="text-sm font-black uppercase mb-8 italic tracking-widest text-gray-500">Stock en Línea</h2>
           <div className="flex flex-col gap-4">
-            {unidades.length > 0 ? unidades.map(u => (
-              <div key={u.id} className="flex items-center gap-4 bg-[#111] p-4 rounded-2xl border border-gray-800 group hover:border-red-900/40 transition-all">
-                <img src={u.img} className="w-20 h-20 object-cover rounded-xl border border-gray-900 shadow-md" alt="thumb" />
+            {unidades.map(u => (
+              <div key={u.id} className="flex items-center gap-4 bg-[#111] p-4 rounded-2xl border border-gray-800">
+                <img src={u.imgPrincipal || u.imagenes[0]} className="w-20 h-20 object-cover rounded-xl border border-gray-900" alt="car" />
                 <div className="flex-1">
                   <p className="text-[11px] font-black leading-none uppercase">{u.marca} {u.modelo}</p>
-                  <p className="text-[9px] text-gray-600 mt-2 font-bold italic">{u.precio} • {u.anio}</p>
+                  <p className="text-[8px] text-gray-600 mt-2 font-bold uppercase">{u.precio} • {u.imagenes?.length || 1} FOTOS</p>
                 </div>
-                <button 
-                  onClick={() => borrarUnidad(u.id)} 
-                  className="bg-red-900/10 text-red-500 px-4 py-2 rounded-xl text-[9px] font-black uppercase hover:bg-red-600 hover:text-white transition-all"
-                >
-                  Borrar
-                </button>
+                <button onClick={() => borrarUnidad(u.id)} className="bg-red-900/10 text-red-500 px-4 py-2 rounded-xl text-[9px] font-black hover:bg-red-600 hover:text-white transition-all">Borrar</button>
               </div>
-            )) : (
-              <p className="text-center py-20 text-gray-800 font-black uppercase text-[10px] tracking-widest italic">No hay vehículos publicados</p>
-            )}
+            ))}
           </div>
         </div>
-
       </div>
-      
-      <button onClick={() => navigate("/")} className="block mx-auto mt-12 text-gray-800 text-[10px] font-black uppercase tracking-[0.5em] hover:text-white transition-all">
-        Ver sitio público
-      </button>
     </div>
   );
 };
